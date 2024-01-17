@@ -1,0 +1,97 @@
+<%- include('partials/header'); -%>
+
+<style>
+    form {
+        width: 400px;
+        padding: 30px;
+    }
+</style>
+
+<form>
+    <h2>Edit Profile</h2>
+    <% if(user) { %>
+    <label for="name">Name</label>
+    <input type="text" name="name" value="<%= user.name %>"/>
+    <div class="name error"></div>
+    <label for="profileImg">Profile Picture</label>
+    <input type="file" name="profileImg" id="profileImg" />
+    <div class="profileImg error"></div>
+    <span style="display: none;" id="userid"><%= user._id%></span>
+    <center><button>Edit</button></center>
+    <% } %>
+</form>
+
+<script>
+    const form = document.querySelector('form');
+    const nameErr = document.querySelector('.name.error');
+    const profileImgErr = document.querySelector('.profileImg.error');
+    const id = document.getElementById("userid");
+
+    const profileImg = document.getElementById("profileImg");
+
+    form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        const img = profileImg.files[0];
+        const fileData = new FormData();
+        fileData.append('profileImg', img);
+
+        const userid = id.textContent;
+        const name = form.name.value;
+
+        try {
+
+            if( img ) {
+                const upload = await fetch('/upload', {
+                method: 'POST',
+                body: fileData
+                })
+                .then(async (result) => {
+
+                    const file = await result.json();
+                    const filePath = file.filePath;
+
+                    const res = await fetch('/editprofile', {
+                    method: 'POST',
+                    body: JSON.stringify({ userid, name, filePath}),
+                    headers: { 'Content-Type' : 'application/json' }
+                    });
+
+                    const data = await res.json();
+
+                    if (data.error) {
+                        console.log(data.error);
+                        nameErr.textContent = data.error.name;
+                    }
+                    
+                    if (data.User) {
+                        location.assign('/');
+                    }
+                })
+                .catch(err => console.log(err));
+            }
+            else {
+                const res = await fetch('/editprofile', {
+                method: 'POST',
+                body: JSON.stringify({ userid, name}),
+                headers: { 'Content-Type' : 'application/json' }
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    console.log(data.error);
+                    nameErr.textContent = data.error.name;
+                }
+                
+                if (data.User) {
+                    location.assign('/');
+                }
+            }
+        } 
+        catch (err) {
+            console.log(err);
+        }
+    })
+</script>

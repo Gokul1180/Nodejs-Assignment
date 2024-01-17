@@ -1,0 +1,107 @@
+<%- include('partials/header'); -%>
+
+<style>
+    form {
+        width: 400px;
+        padding: 30px;
+    }
+</style>
+
+<form method="post" enctype="multipart/form-data">
+    <h2>Sign Up</h2>
+    <div class="phoneno email error"></div>
+    <label for="name">Name</label>
+    <input type="text" name="name" />
+    <div class="name error"></div>
+    <label for="phoneno">Phone No.</label>
+    <input type="text" name="phoneno" />
+    <div class="phone error"></div>
+    <label for="email">Email</label>
+    <input type="email" name="email" />
+    <div class="emailid error"></div>
+    <label for="password">Password</label>
+    <input type="password" name="password" />
+    <div class="password error"></div>
+    <label for="profileImg">Profile Picture</label>
+    <input type="file" name="profileImg" id="profileImg"/>
+    <div class="profileImg error"></div>
+    <center><button>Sign Up</button></center>
+</form>
+
+<script>
+    const form = document.querySelector('form');
+    const nameErr = document.querySelector('.name.error');
+    const phonenoEmailErr = document.querySelector('.phoneno.email.error');
+    const passErr = document.querySelector('.password.error');
+    const profileImgErr = document.querySelector('.profileImg.error');
+    const phonenoErr = document.querySelector('.phone.error');
+    const emailErr = document.querySelector('.emailid.error');
+
+    const profileImg = document.getElementById("profileImg");
+
+    form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        nameErr.textContent = "";
+        phonenoEmailErr.textContent = "";
+        passErr.textContent = "";
+        profileImgErr.textContent = "";
+        phonenoErr.textContent = "";
+        emailErr.textContent = "";
+
+        const img = profileImg.files[0];
+        const fileData = new FormData();
+        fileData.append('profileImg', img);
+
+        const name = form.name.value;
+        const email = form.email.value;
+        const phoneno = form.phoneno.value;
+        const password = form.password.value;
+        console.log(name,email,phoneno,password);
+
+        try {
+
+            const upload = await fetch('/upload', {
+                method: 'POST',
+                body: fileData
+            })
+            .then(async (result) => {
+
+                const file = await result.json();
+                const filePath = file.filePath;
+
+                const res = await fetch('/signup', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, password, phoneno, filePath}),
+                headers: { 'Content-Type' : 'application/json' }
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    console.log(data.error);
+                    nameErr.textContent = data.error.name;
+                    passErr.textContent = data.error.password;
+                    phonenoErr.textContent = data.error.phoneno;
+                    emailErr.textContent = data.error.email;
+                    phonenoEmailErr.textContent = data.error.emailorphoneno;
+                }
+                
+                if (data.User) {
+                    location.assign('/');
+                }
+            })
+            .catch(err => console.log(err));
+
+            
+            
+        }   
+        catch (err) {
+            console.log(err);
+        } 
+    });
+</script>
+
+
+<%- include('partials/footer'); -%>

@@ -1,0 +1,55 @@
+<%- include('partials/header'); -%>
+
+<style>
+    form {
+        width: 400px;
+        padding: 30px;
+    }
+</style>
+
+<form>
+    <h2>Edit Profile</h2>
+    <% if(admin) { %>
+    <label for="name">Name</label>
+    <input type="text" name="name" value="<%= admin.name %>"/>
+    <div class="name error"></div>
+    <span style="display: none;" id="adminid"><%= admin._id%></span>
+    <center><button>Edit</button></center>
+    <% } %>
+</form>
+
+<script>
+    const form = document.querySelector('form');
+    const nameErr = document.querySelector('.name.error');
+    const id = document.getElementById("adminid");
+
+    form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        const adminid = id.textContent;
+        const name = form.name.value;
+
+        try {
+            const res = await fetch('/admineditprofile', {
+            method: 'POST',
+            body: JSON.stringify({ adminid, name}),
+            headers: { 'Content-Type' : 'application/json' }
+            });
+
+            const data = await res.json();
+
+            if (data.error) {
+                console.log(data.error);
+                nameErr.textContent = data.error.name;
+            }
+            
+            if (data.Admin) {
+                location.assign('/adminprofile');
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+    })
+</script>

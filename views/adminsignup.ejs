@@ -1,0 +1,71 @@
+<%- include('partials/header'); -%>
+
+<style>
+    form {
+        width: 400px;
+        padding: 30px;
+    }
+</style>
+
+<form method="post" enctype="multipart/form-data">
+    <h2>Admin Sign Up</h2>
+    <label for="name">Name</label>
+    <input type="text" name="name" />
+    <div class="name error"></div>
+    <label for="email">Email</label>
+    <input type="email" name="email" />
+    <div class="emailid error"></div>
+    <label for="password">Password</label>
+    <input type="password" name="password" />
+    <div class="password error"></div>
+    <center><button>Sign Up</button></center>
+</form>
+
+<script>
+    const form = document.querySelector('form');
+    const nameErr = document.querySelector('.name.error');
+    const passErr = document.querySelector('.password.error');
+    const emailErr = document.querySelector('.emailid.error');
+
+    form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        nameErr.textContent = "";
+        passErr.textContent = "";
+        emailErr.textContent = "";
+
+        const name = form.name.value;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+
+            const res = await fetch('/adminsignup', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password }),
+            headers: { 'Content-Type' : 'application/json' }
+            });
+
+            const data = await res.json();
+
+            if (data.error) {
+                console.log(data.error);
+                nameErr.textContent = data.error.name;
+                passErr.textContent = data.error.password;
+                emailErr.textContent = data.error.email;
+            }
+            
+            if (data.Admin) {
+                location.assign('/');
+            }
+                
+        }   
+        catch (err) {
+            console.log(err);
+        } 
+    });
+</script>
+
+
+<%- include('partials/footer'); -%>

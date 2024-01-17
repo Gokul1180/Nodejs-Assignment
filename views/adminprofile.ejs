@@ -1,0 +1,39 @@
+<%- include('partials/header'); -%>
+
+<div>
+    <h1>User Profile</h1>
+    <% if(admin) { %>  
+    <p><strong>Name : </strong> <%= admin.name %></p>
+    <p><strong>Email : </strong> <%= admin.email %></p>
+    <button id="editBtn" style="width: 13%;">Edit Profile</button>
+    <button style="background-color: red; color: white;" name="deleteBtn" onclick="deleteAccount('<%= admin._id %>')">Delete Account</button>
+    <% } %>
+</div>
+
+<script>
+    async function deleteAccount(id) {
+        const result = confirm("Do you want to delete your account?");
+        if(result) {
+            const res = await fetch('/admindeleteprofile', {
+                method: 'DELETE',
+                body: JSON.stringify({ id }),
+                headers: { 'Content-Type' : 'application/json' }
+            });
+
+            const data = await res.json();
+
+            if(data.result) {
+                alert("Profile deleted successfully!");
+                window.location.href = '/logout';
+            }
+        }
+    }
+
+    const editBtn = document.getElementById("editBtn");
+
+    editBtn.addEventListener('click', () => {
+        window.location.href = '/admineditprofile';
+    })
+</script>
+
+<%- include('partials/footer'); -%>

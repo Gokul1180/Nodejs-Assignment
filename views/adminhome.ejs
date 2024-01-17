@@ -1,0 +1,42 @@
+<%- include('partials/header'); -%>
+
+<div>
+    <h1>User Profiles</h1>
+    <% if(users.length > 0) { %>
+        <% users.forEach(user => { %>
+            <div class="">
+                <img src="<%= user.profileImg %>" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">    
+                <p><strong>Name : </strong> <%= user.name %></p>
+                <p><strong>Email : </strong> <%= user.email %></p>
+                <p><strong>Phone Number : </strong> <%= user.phoneno %></p>
+                <a href="/admineditprofile/<%= user._id %>"><button id="editBtn" style="width: 13%;">Edit Profile</button></a>
+                <button style="background-color: red; color: white;" name="deleteBtn" onclick="deleteAccount('<%= user._id %>')">Delete Account</button>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <h3> There are no users to display here.</h3>
+    <% } %>
+</div>
+
+<script>
+    async function deleteAccount(id) {
+        const result = confirm("Do you want to delete your account?");
+        if(result) {
+            const res = await fetch('/deleteprofile', {
+                method: 'DELETE',
+                body: JSON.stringify({ id }),
+                headers: { 'Content-Type' : 'application/json' }
+            });
+
+            const data = await res.json();
+
+            if(data.result) {
+                alert("Profile deleted successfully!");
+                window.location.href = '/';
+            }
+        }
+    }
+
+</script>
+
+<%- include('partials/footer'); -%>
