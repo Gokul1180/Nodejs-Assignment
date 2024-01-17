@@ -43,3 +43,6 @@ Choose between MongoDB or Firebase for the database.
 
 Data Validation  
 14. Data Validation: Implement thorough data validation to ensure the correctness and integrity of input data.
+
+Note :-
+Change username and password in the dbUser variable with your mongodb atlas username and password.
